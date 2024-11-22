@@ -26,6 +26,8 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "dio_ros_driver/msg/dio_port.hpp"
+#include "dio_ros_driver/msg/dio_array.hpp"
+#include "dio_ros_driver/msg/dio_port_value.hpp"
 
 #include <string>
 #include <cstdint>
@@ -60,12 +62,15 @@ class DIO_ROSDriver : public rclcpp::Node {
       std::shared_ptr<DIO_AccessorBase> dio_accessor);           // !<@brief Add ports to given accessor.
   void receiveWriteRequest(const dio_ros_driver::msg::DIOPort::SharedPtr &dout_topic,
          const uint32_t &port_id);                               // !<@brief receive user write request.
+  void receiveArrayWriteRequest(const dio_ros_driver::msg::DIOArray::ConstSharedPtr &dout_array_topic); // !<@brief receive user write array request.
   void readDINPorts(void);                                                         // !<@brief read all DI port and send them as topics
   void writeDOUTPorts(void);                                                       // !<@brief DO ports by value according to received request
 
   // Publisher and subscribers.
   std::array<rclcpp::Publisher<dio_ros_driver::msg::DIOPort>::SharedPtr, MAX_PORT_NUM> din_port_publisher_array_;     // !<@brief ros publishers array for DIN ports
   std::array<rclcpp::Subscription<dio_ros_driver::msg::DIOPort>::SharedPtr, MAX_PORT_NUM> dout_port_subscriber_array_;  // !<@brief ros subscribers array for DOUT ports
+  rclcpp::Publisher<dio_ros_driver::msg::DIOArray>::SharedPtr din_port_array_publisher_;                                // !<@brief ros subscriber for DIN array ports
+  rclcpp::Subscription<dio_ros_driver::msg::DIOArray>::SharedPtr dout_port_array_subscriber_;                           // !<@brief ros publisher for DOUT array ports
 
   // Timer callback
   rclcpp::TimerBase::SharedPtr dio_update_timer_;  // !<@brief Timer for DIO update.

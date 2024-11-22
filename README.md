@@ -16,7 +16,7 @@ $ ros2 launch dio_ros_driver dio_ros_driver.launch.xml
 ```
 
 After executing this command, `dio_ros_driver_node` will run without any message.
-You can observe topics such as `/dio/din[0-7]`, and `/dio/dout[0-7]`. `/dio/din[0-7]` have a boolean value read from a corresponding port. On the other hand, `/dio/dout[0-7]` have a boolean value to be written to a corresponding port.
+You can observe topics such as `/dio/din[0-7]`, `/dio/din_array`, `/dio/dout[0-7]`, and `/dio/dout_array`. `/dio/din[0-7]`, `/dio/din_array` have a boolean value read from a corresponding port. On the other hand, `/dio/dout[0-7]`, `/dio/dout_array` have a boolean value to be written to a corresponding port. 
 `dio_ros_driver_node` borrows ROS `diagnostics` framework as diagnostic function, and publishes `/diagnostics` topic.
 
 
@@ -32,6 +32,12 @@ No arguments supported. All parameters will be written in the config file as exp
 * `/dio/dout[0-7]`
   * message type: `dio_ros_driver/DIOPort`
   * descritpion: Boolean value written into DO ports
+* `/dio/din_array`
+  * message type: `dio_ros_driver/msg/DIOArray`
+  * description: Boolean values read from DI ports when using multi DI ports
+* `/dio/dout_array`
+  * message type: `dio_ros_driver/msg/DIOArray`
+  * description: Boolean values written into DO ports when using multi DO ports
 * `/diagnostics`
   * message type: `diagnostic_msgs/DiagnosticArray`
   * description: Diagnostic notification sent at frequency. The notification is provided per a bundle of DI ports and that of DO ports.

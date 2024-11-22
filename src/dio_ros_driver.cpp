@@ -73,6 +73,9 @@ DIO_ROSDriver::DIO_ROSDriver(const std::string &node_name, const rclcpp::NodeOpt
     std::string topic_name = "/dio/din" + std::to_string(i);
     din_port_publisher_array_.at(i) = this->create_publisher<dio_ros_driver::msg::DIOPort>(topic_name, rclcpp::QoS(1));
   }
+
+  din_port_array_publisher_ = this->create_publisher<dio_ros_driver::msg::DIOArray>("/dio/din_array", rclcpp::QoS(1));
+
   // prepare subscribers
   for (uint32_t i = 0; i < MAX_PORT_NUM; i++) {
     std::string topic_name = "/dio/dout" + std::to_string(i);
@@ -81,6 +84,12 @@ DIO_ROSDriver::DIO_ROSDriver(const std::string &node_name, const rclcpp::NodeOpt
                                                                                                 rclcpp::QoS(1),
                                                                                                 callback);
   }
+
+  dout_port_array_subscriber_ = this->create_subscription<dio_ros_driver::msg::DIOArray>("/dio/dout_array",
+                                                                                        rclcpp::QoS(1),
+                                                                                        std::bind(&DIO_ROSDriver::receiveArrayWriteRequest, this, std::placeholders::_1));
+  
+
   // create walltimer callback
   std::chrono::milliseconds update_cycle = std::chrono::milliseconds(1000U/static_cast<uint32_t>(access_frequency_));
   dio_update_timer_ = this->create_wall_timer(update_cycle,
@@ -187,18 +196,40 @@ void DIO_ROSDriver::receiveWriteRequest(const dio_ros_driver::msg::DIOPort::Shar
 }
 
 /**
+ * @brief callback function to hold and notify write request
+ * @param[in] dout_array_topic topic to update ports from application
+ * @param[in] array_id  targeted array_id number.
+ */
+void DIO_ROSDriver::receiveArrayWriteRequest(const dio_ros_driver::msg::DIOArray::ConstSharedPtr &dout_array_topic) {
+  for (auto dout_port_data : dout_array_topic->values) {
+    if (dout_port_data.port < MAX_PORT_NUM) {
+      auto dout_port_msg = std::make_shared<dio_ros_driver::msg::DIOPort>();
+      dout_port_msg->value = dout_port_data.value;
+      receiveWriteRequest(dout_port_msg, static_cast<uint32_t>(dout_port_data.port));
+    }
+  }
+}
+
+/**
  * @brief convert read value to topic
  * read values from all DI ports and send them as respective topic to application node
  */
 void DIO_ROSDriver::readDINPorts(void) {
   dio_ros_driver::msg::DIOPort din_port;
+  dio_ros_driver::msg::DIOArray port_array_values;
+  dio_ros_driver::msg::DIOPortValue port_value;
   for (uint32_t i = 0; i < din_accessor_->getNumOfPorts(); i++) {
     int32_t read_value = din_accessor_->readPort(i);
     if (read_value >= 0) {
       din_port.value = static_cast<bool>(read_value);
       din_port_publisher_array_.at(i)->publish(din_port);
+      port_value.port = static_cast<u_int8_t>(i);
+      port_value.value = static_cast<bool>(read_value);
+      port_array_values.values.push_back(port_value);
     }
   }
+  port_array_values.stamp = get_clock()->now();
+  din_port_array_publisher_->publish(port_array_values);
 }
 
 /**

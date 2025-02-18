@@ -3,12 +3,46 @@
 # ports are given dictionary
 # whose key is port id,
 # and value is port address
-/dio/dio_ros_driver_node:
+/dio/gpiochip1:
   ros__parameters:
-    chip_name: "gpiochip0"
+    chip_name: "gpiochip1"
     access_frequency: 10 # Hz with positive integer.
     din_value_inverse: false
-    din_port_offset: [72, 73, 74, 75, 76, 77, 78, 79]
+    din_port_offset: [0, 1, 2, 3, 4, 5, 6, 7]
     dout_value_inverse: false
     dout_default_value: true
-    dout_port_offset: [105, 106, 107, 108, 109, 110, 111, 112]
+    dout_port_offset: [-1]
+
+/dio/gpiochip2:
+  ros__parameters:
+    chip_name: "gpiochip2"
+    access_frequency: 10 # Hz with positive integer.
+    din_value_inverse: false
+    din_port_offset: [-1]
+    dout_value_inverse: true
+    dout_default_value: false
+    dout_port_offset: [0, 1, 2, 3, 4, 5, 6, 7]
+
+/dio/controler0:
+  ros__parameters:
+    access_frequency: 10 # Hz with positive integer.
+    din_topic: "/dio/gpiochip1/din0"
+    do_topic: "/dio/gpiochip2/dout7"
+
+/dio/controler1:
+  ros__parameters:
+    access_frequency: 10 # Hz with positive integer.
+    din_topic: "/dio/gpiochip1/din1"
+    do_topic: "/dio/gpiochip2/dout3"
+
+/dio/controler2:
+  ros__parameters:
+    access_frequency: 10 # Hz with positive integer.
+    din_topic: "/dio/gpiochip1/din2"
+    do_topic: "/dio/gpiochip2/dout2"
+
+/dio/controler3:
+  ros__parameters:
+    access_frequency: 10 # Hz with positive integer.
+    din_topic: "/dio/gpiochip1/din3"
+    do_topic: "/dio/gpiochip2/dout4"

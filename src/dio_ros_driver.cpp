@@ -59,18 +59,20 @@ DIO_ROSDriver::DIO_ROSDriver(const std::string &node_name, const rclcpp::NodeOpt
 
   auto tmp_din_offset_list = this->get_parameter("din_port_offset").as_integer_array();
   for (auto tmp_port_offset : tmp_din_offset_list) {
+    if( tmp_port_offset < 0)break;
     din_port_offset_.push_back(static_cast<uint32_t>(tmp_port_offset));
   }
   
   auto tmp_dout_offset_list = this->get_parameter("dout_port_offset").as_integer_array();
   for (auto tmp_port_offset : tmp_dout_offset_list) {
+    if( tmp_port_offset < 0)break;
     dout_port_offset_.push_back(static_cast<uint32_t>(tmp_port_offset));
   }
 
 
   // prepare publishers
   for (uint32_t i = 0; i < MAX_PORT_NUM; i++) {
-    std::string topic_name = "/dio/din" + std::to_string(i);
+    std::string topic_name = "/dio/" + chip_name_ + "/din" + std::to_string(i);
     din_port_publisher_array_.at(i) = this->create_publisher<dio_ros_driver::msg::DIOPort>(topic_name, rclcpp::QoS(1));
   }
 
@@ -78,7 +80,7 @@ DIO_ROSDriver::DIO_ROSDriver(const std::string &node_name, const rclcpp::NodeOpt
 
   // prepare subscribers
   for (uint32_t i = 0; i < MAX_PORT_NUM; i++) {
-    std::string topic_name = "/dio/dout" + std::to_string(i);
+    std::string topic_name = "/dio/" + chip_name_ + "/dout" + std::to_string(i);
     std::function<void(std::shared_ptr<dio_ros_driver::msg::DIOPort>)> callback = std::bind(&DIO_ROSDriver::receiveWriteRequest, this, std::placeholders::_1, i);
     dout_port_subscriber_array_.at(i) = this->create_subscription<dio_ros_driver::msg::DIOPort>(topic_name,
                                                                                                 rclcpp::QoS(1),
@@ -98,6 +100,7 @@ DIO_ROSDriver::DIO_ROSDriver(const std::string &node_name, const rclcpp::NodeOpt
   // initialize accessors and diagnostic updater.
   din_accessor_ = std::make_shared<DINAccessor>();
   dout_accessor_ = std::make_shared<DOUTAccessor>();
+
 }
 
 /**

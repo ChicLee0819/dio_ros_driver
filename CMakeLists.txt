@@ -46,6 +46,9 @@ ament_auto_add_executable(${PROJECT_NAME}_node ${SOURCE_FILES})
 set(DOUT_CONTROL_FILES src/dout_controler.cpp)
 ament_auto_add_executable(dout_controler_node ${DOUT_CONTROL_FILES})
 
+set(DOUT_BUZZER_FILES src/dout_buzzer.cpp)
+ament_auto_add_executable(dout_buzzer_node ${DOUT_BUZZER_FILES})
+
 find_package(Boost REQUIRED
   COMPONENTS system
 )
@@ -54,11 +57,15 @@ find_package(Boost REQUIRED
 target_link_libraries(${PROJECT_NAME}_node
   gpiod
 )
+target_link_libraries(dout_buzzer_node
+  gpiod
+)
 
 # find header file
 rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME} "rosidl_typesupport_cpp")
 target_link_libraries(${PROJECT_NAME}_node "${cpp_typesupport_target}")
 target_link_libraries(dout_controler_node "${cpp_typesupport_target}")
+target_link_libraries(dout_buzzer_node "${cpp_typesupport_target}")
 
 # install node.
 ament_auto_package(INSTALL_TO_SHARE

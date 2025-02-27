@@ -21,13 +21,13 @@
     din_port_offset: [-1]
     dout_value_inverse: true
     dout_default_value: false
-    dout_port_offset: [0, 1, 2, 3, 4, 5, 6, 7]
+    dout_port_offset: [0, 1, 2, 3, 4, 5, 7]
 
 /dio/controler0:
   ros__parameters:
     access_frequency: 10 # Hz with positive integer.
     din_topic: "/dio/gpiochip1/din0"
-    do_topic: "/dio/gpiochip2/dout7"
+    do_topic: "/dio/gpiochip2/dout6"
 
 /dio/controler1:
   ros__parameters:
@@ -46,3 +46,10 @@
     access_frequency: 10 # Hz with positive integer.
     din_topic: "/dio/gpiochip1/din3"
     do_topic: "/dio/gpiochip2/dout4"
+
+/dio/buzzer0:
+  ros__parameters:
+    access_frequency: 10 # Hz with positive integer.
+    din_topic: "/dio/gpiochip2/dout6"
+    chipname: "gpiochip2"
+    line_num: 6

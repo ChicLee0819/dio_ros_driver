@@ -21,6 +21,9 @@
     <node pkg="dio_ros_driver" exec="dout_controler_node" name="controler3" output="log" respawn="true">
       <param from="$(var config_file)"/>
     </node>
+    <node pkg="dio_ros_driver" exec="dout_buzzer_node" name="buzzer0" output="log" respawn="true">
+      <param from="$(var config_file)"/>
+    </node>
   </group>
   <group>
     <node pkg="image_tools" exec="showimage" name="eventimage" output="log" respawn="true"></node>

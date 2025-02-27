@@ -64,45 +64,17 @@ public:
     this->publisher_->publish(message);
   }
 
-  void setHigh() const
-  {
-    auto message = dio_ros_driver::msg::DIOPort();
-    message.value = static_cast<bool>(1);
-    RCLCPP_DEBUG(this->get_logger(), "Publishing: 'set /dio/gpiochip2/dout0 to True'");
-    this->publisher_->publish(message);
-  }
-
-  void setLow() const
-  {
-    auto message = dio_ros_driver::msg::DIOPort();
-    message.value = static_cast<bool>(0);
-    RCLCPP_DEBUG(this->get_logger(), "Publishing: 'set /dio/gpiochip2/dout0 to Low'");
-    this->publisher_->publish(message);
-  }
-
 private:
   void topic_callback(const dio_ros_driver::msg::DIOPort::SharedPtr msg) const
   {
     RCLCPP_DEBUG(this->get_logger(), "Got Subscription '%s': '%s'", din_topic_str_.c_str(), msg->value? "True":"False");
     this->setValue(msg->value);
-    /*
-    if (msg->value)
-    {
-      this->setHigh();
-    }
-    else
-    {
-      this->setLow();
-    }
-    */
   }
-  //rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Publisher<dio_ros_driver::msg::DIOPort>::SharedPtr publisher_;
   rclcpp::Subscription<dio_ros_driver::msg::DIOPort>::SharedPtr subscription_;
   uint32_t access_frequency_;
   std::string din_topic_str_;
   std::string do_topic_str_;
-  //size_t count_;
 };
 
 int main(int argc, char * argv[])
